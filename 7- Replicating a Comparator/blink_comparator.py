@@ -6,6 +6,19 @@ import cv2 as cv
 MIN_NUM_KEYPOINT_MATCHES = 50
 
 
+def find_best_matches(img1, img2):
+    """Return list of keypoints and list of best matches for two images."""
+    orb = cv.ORB_create(nfeatures=100)  # Initiate ORB object
+    kp1, desc1 = orb.detectAndCompute(img1, mask=None)
+    kp2, desc2 = orb.detectAndCompute(img2, mask=None)
+    bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
+    matches = bf.match(desc1, desc2)
+    matches = sorted(matches, key=lambda x: x.distance)
+    best_matches = matches[:MIN_NUM_KEYPOINT_MATCHES]
+
+    return kp1, kp2, best_matches
+
+
 def main():
     """Loop through 2 folders with paired images, register & blink images."""
     night1_files = sorted(os.listdir('night_1'))
@@ -25,8 +38,12 @@ def main():
         QC_best_matches(img_match)  # Comment out to ignore.
         img1_registered = register_image(img1, img2, kp1, kp2, best_matches)
 
-        blink(img1, img1_registered, 'Check Registration', num_loops=5)
+        blink(img1, img1_registered, 'Check Registration', num_loops=5)  # Comment out to ignore.
         out_filename = '{}_registered.png'.format(night1_files[i][:-4])
         cv.imwrite(str(path3 / out_filename), img1_registered)  # Will overwrite!
         cv.destroyAllWindows()
         blink(img1_registered, img2, 'Blink Comparator', num_loops=15)
+
+
+if __name__ == '__main__':
+    main()
