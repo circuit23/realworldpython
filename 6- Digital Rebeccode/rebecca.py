@@ -1,7 +1,9 @@
+import operator
 import sys
 import os
 import random
 from collections import defaultdict, Counter
+import matplotlib.pyplot as plt
 
 
 def load_file(infile):
@@ -80,6 +82,13 @@ def main():
                                                  len(char_dict[key])))
         print('\nNumber of distinct characters: {}'.format(len(char_dict)))
         print("Total number of characters: {:,}\n".format(len(text)))
+
+        char_freq = Counter(text)
+        char_freq_sorted = sorted(char_freq.items(), key=operator.itemgetter(1), reverse=True)
+        x, y = zip(*char_freq_sorted)  # * unpacks iterable
+        fig, ax = plt.subplots()
+        ax.bar(x, y)
+        fig.show()
 
         print("encrypted ciphertext = \n {}\n".format(ciphertext))
         print("decrypted plaintext = ")
