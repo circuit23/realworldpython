@@ -19,6 +19,37 @@ def make_dict(text, shift):
     return char_dict
 
 
+def encrypt(message, char_dict):
+    """Return list of indexes representing characters in a message."""
+    encrypted = []
+    for char in message.lower():
+        if len(char_dict[char]) > 1:
+            index = random.choice(char_dict[char])
+        elif len(char_dict[char]) == 1:  # Random.choice fails if only 1 choice
+            index = char_dict[char][0]
+        elif len(char_dict[char]) == 0:
+            print("\nCharacter {} not in dictionary.".format(char), file=sys.stderr)
+            continue
+        encrypted.append(index)
+    return encrypted
+
+
+def decrypt(message, text, shift):
+    """Decrypt ciphertext list and return plaintext string."""
+    plaintext = ''
+    indexes = [s.replace(',', '').replace('[', '').replace(']', '') for s in message.split()]
+    for i in indexes:
+        plaintext += text[int(i) - shift]
+    return plaintext
+
+
+def check_for_fail(ciphertext):
+    """Return True if ciphertext contains any duplicate keys."""
+    check = [k for k, v in Counter(ciphertext).items() if v > 1]
+    if len(check) > 0:
+        return True
+
+
 def main():
     message = input("Enter plaintext or ciphertext: ")
     process = input("Enter 'encrypt' or 'decrypt': ")
@@ -61,4 +92,5 @@ def main():
         print("\ndecrypted plaintext = \n {}".format(plaintext))
 
 
-main()
+if __name__ == '__main__':
+    main()
