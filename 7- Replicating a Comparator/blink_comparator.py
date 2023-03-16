@@ -19,6 +19,31 @@ def find_best_matches(img1, img2):
     return kp1, kp2, best_matches
 
 
+def QC_best_matches(img_match):
+    """Draw best keypoint matches connected by colored lines."""
+    cv.imshow('Best {} Matches'.format(MIN_NUM_KEYPOINT_MATCHES), img_match)
+    cv.waitkey(2500)  # Keeps window active 2.5 seconds
+
+
+def register_image(img1, img2, kp1, kp2, best_matches):
+    """Return first image registered to second image."""
+    if len(best_matches) >= MIN_NUM_KEYPOINT_MATCHES:
+        src_pts = np.zeros((len(best_matches), 2), dtype=np.float32)
+        dst_pts = np.zeros((len(best_matches), 2), dtype=np.float32)
+        for i, match in enumerate(best_matches):
+            src_pts[i, :] = kp1[match.queryIdx].pt
+            dst_pts[i, :] = kp2[match.trainIdx].pt
+        h_array, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC)
+        height, width = img2.shape  # Get dimensions of image 2.
+        img1_warped = cv.warpPerspective(img1, h_array, (width, height))
+
+        return img1_warped
+
+    else:
+        print("WARNING: Number of keypoint matches < {}\n".format(MIN_NUM_KEYPOINT_MATCHES))
+        return img1
+
+
 def main():
     """Loop through 2 folders with paired images, register & blink images."""
     night1_files = sorted(os.listdir('night_1'))
