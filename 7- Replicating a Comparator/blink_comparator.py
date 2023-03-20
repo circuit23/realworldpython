@@ -22,7 +22,7 @@ def find_best_matches(img1, img2):
 def QC_best_matches(img_match):
     """Draw best keypoint matches connected by colored lines."""
     cv.imshow('Best {} Matches'.format(MIN_NUM_KEYPOINT_MATCHES), img_match)
-    cv.waitkey(2500)  # Keeps window active 2.5 seconds
+    cv.waitKey(2500)  # Keeps window active 2.5 seconds
 
 
 def register_image(img1, img2, kp1, kp2, best_matches):
@@ -42,6 +42,15 @@ def register_image(img1, img2, kp1, kp2, best_matches):
     else:
         print("WARNING: Number of keypoint matches < {}\n".format(MIN_NUM_KEYPOINT_MATCHES))
         return img1
+
+
+def blink(image_1, image_2, window_name, num_loops):
+    """Replicate blink comparator with two images."""
+    for _ in range(num_loops):
+        cv.imshow(window_name, image_1)
+        cv.waitKey(330)
+        cv.imshow(window_name, image_2)
+        cv.waitKey(330)
 
 
 def main():
